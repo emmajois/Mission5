@@ -13,8 +13,15 @@
 <div class="text-center">
     <p>Fill out this movie form with your favorite movie!</p>
     <form method="post">
-        <label asp-for="Category">Movie Category</label>
-        <input asp-for="Category" />
+        <div asp-validation-summary="All"></div>
+        <label asp-for="CategoryId">Movie Category</label>
+        <select asp-for="CategoryId">
+            <option value="">Select Movie Category</option>
+            @foreach (Category cat in ViewBag.Categories)
+            {
+                <option value="@cat.CategoryId">@cat.CategoryName</option>
+            }
+        </select>
         <br />
 
         <label asp-for="Title">Movie Title</label>
@@ -54,7 +61,7 @@
         <input asp-for="Notes" />
         <br />
 
-        <button type="submit">Add</button>
+        <button type="submit">Add Movie</button>
 
     </form>
 </div>

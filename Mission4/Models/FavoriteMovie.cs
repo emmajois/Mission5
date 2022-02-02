@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,9 +12,6 @@ namespace Mission4.Models
         [Key]
         [Required]
         public int MovieId { get; set; }
-
-        [Required]
-        public string Category { get; set; }
 
         [Required]
         public string Title { get; set; }
@@ -34,5 +32,10 @@ namespace Mission4.Models
         //Making sure that notes can only ever be 25 characters long
         [MaxLength(25)]
         public string Notes { get; set; }
+
+        //Build Foreign Key relationship
+        //[ForeignKey("CategoryModel")]
+        public int CategoryId { get; set; }
+        public Category Category { get; set; }
     }
 }

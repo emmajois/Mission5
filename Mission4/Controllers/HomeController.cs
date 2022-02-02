@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mission4.Models;
 using System;
@@ -13,11 +14,11 @@ namespace Mission4.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        private MovieDBContext _coolContext { get; set; }
+        private MovieDBContext coolContext { get; set; }
         public HomeController(ILogger<HomeController> logger, MovieDBContext somethign)
         {
             _logger = logger;
-            _coolContext = somethign;
+            coolContext = somethign;
         }
 
         public IActionResult Index()
@@ -31,17 +32,73 @@ namespace Mission4.Controllers
         [HttpGet]
         public IActionResult Form()
         {
+            ViewBag.Categories = coolContext.Category.ToList();
+
             return View();
         }
 
         [HttpPost]
         public IActionResult Form(FavoriteMovie ar)
         {
-            _coolContext.Add(ar);
-            _coolContext.SaveChanges();
+            if (ModelState.IsValid)
+            {
+                coolContext.Add(ar);
+                coolContext.SaveChanges();
 
-            return View();
+                return View("ConfirmationPage");
+            }
+            else
+            {
+                ViewBag.Categories = coolContext.Category.ToList();
+                return View();
+            }
+            //Another option
+            //return RedirectToAction("Index");
         }
+
+        [HttpGet]
+        public IActionResult MovieList()
+        {
+            var coolData = coolContext.FavoriteMovies
+                .Include( x => x.Category)
+                .ToList();
+            return View(coolData);
+        }
+
+        [HttpGet]
+        public IActionResult Edit (int movieid)
+        {
+            ViewBag.Categories = coolContext.Category.ToList();
+
+            var movie = coolContext.FavoriteMovies.Single(y => y.MovieId == movieid);
+
+            return View("Form", movie);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(FavoriteMovie fm)
+        {
+            coolContext.Update(fm);
+            coolContext.SaveChanges();
+
+            return RedirectToAction("MovieList");
+        }
+
+        [HttpGet]
+        public IActionResult Delete (int movieid)
+        {
+            var movie = coolContext.FavoriteMovies.Single(y => y.MovieId == movieid);
+            return View(movie);
+        }
+        [HttpPost]
+        public IActionResult Delete (FavoriteMovie fm)
+        {
+            coolContext.FavoriteMovies.Remove(fm);
+            coolContext.SaveChanges();
+
+            return RedirectToAction("MovieList");
+        }
+
         public IActionResult Privacy()
         {
             return View();
